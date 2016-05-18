@@ -13,7 +13,7 @@ module Actions
                 :repo_id => repo.id,
                 :schedule => sync_plan.schedule_format,
                 :enabled => sync_plan.enabled
-              )
+                         )
             end
           end
         end
