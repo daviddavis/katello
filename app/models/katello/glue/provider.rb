@@ -15,10 +15,6 @@ module Katello
         queue_import_manifest options
       end
 
-      def delete_manifest
-        queue_delete_manifest
-      end
-
       def refresh_manifest(upstream, options = {})
         options = { :upstream => upstream }.merge(options)
         options.assert_valid_keys(:upstream)
@@ -297,36 +293,9 @@ module Katello
         error_texts.join('<br />')
       end
 
-      def exec_delete_manifest
-        Resources::Candlepin::Owner.destroy_imports self.organization.label, true
-        index_subscriptions
-      end
-
       def index_subscriptions
         Katello::Subscription.import_all
         Katello::Pool.import_all
-      end
-
-      def rollback_delete_manifest
-        # Nothing to be done until implemented in katello where possible pulp recovery actions should be done(?)
-      end
-
-      def queue_delete_manifest
-        import_logger.debug "Deleting manifest for provider #{self.name}"
-
-        begin
-          pre_queue.create(:name     => "delete manifest for owner: #{self.organization.name}",
-                           :priority => 3, :action => [self, :exec_delete_manifest],
-                           :action_rollback => [self, :rollback_delete_manifest])
-          if SETTINGS[:katello][:use_pulp]
-            pre_queue.create(:name => "refresh product repos for deletion",
-                             :priority => 6, :action => [self, :refresh_existing_products])
-          end
-          self.save!
-        rescue => error
-          display_manifest_message('delete', error)
-          raise error
-        end
       end
 
       def rules_source

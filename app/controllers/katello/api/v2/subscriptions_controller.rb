@@ -128,7 +128,7 @@ module Katello
     api :POST, "/organizations/:organization_id/subscriptions/delete_manifest", N_("Delete manifest from Red Hat provider")
     param :organization_id, :number, :desc => N_("Organization id"), :required => true
     def delete_manifest
-      task = async_task(::Actions::Katello::Provider::ManifestDelete, @provider)
+      task = async_task(::Actions::Katello::Organization::ManifestDelete, @organization)
       respond_for_async :resource => task
     end
 
