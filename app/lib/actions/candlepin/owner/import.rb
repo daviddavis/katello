@@ -12,6 +12,7 @@ module Actions
         def run
           options = input.slice(:force, :upstream)
           output[:response] = ::Katello::Resources::Candlepin::Owner.import(input[:label], input[:path], options)
+          fail "Fake some failure"
         end
       end
     end

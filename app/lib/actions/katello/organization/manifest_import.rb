@@ -2,7 +2,13 @@ module Actions
   module Katello
     module Organization
       class ManifestImport < Actions::AbstractAsyncTask
+        include ::Dynflow::Action::Revertible
         middleware.use Actions::Middleware::PropagateCandlepinErrors
+        middleware.use Actions::Middleware::RemoteAction
+
+        def self.revert_action_class
+          Candlepin::Owner::RollbackImport
+        end
 
         def plan(organization, path, force)
           action_subject organization
@@ -25,6 +31,10 @@ module Actions
 
         def humanized_name
           _("Import Manifest")
+        end
+
+        def rescue_strategy
+          Dynflow::Action::Rescue::Revert
         end
       end
     end
