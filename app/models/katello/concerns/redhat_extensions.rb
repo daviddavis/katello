@@ -82,8 +82,9 @@ module Katello
             lifecycle_environments = content_facet.try(:lifecycle_environments) || host.try(:lifecycle_environments)
           end
         when ::Katello::Hostgroup::ContentFacet
-          content_views = [content_facet.try(:content_view), host.try(:content_views)].flatten.compact
-          lifecycle_environments = [content_facet.try(:lifecycle_environment), host.try(:lifecycle_environments)].flatten.compact
+          cvenv = content_facet.content_view_environment || host.content_view_environment
+          content_views = [cvenv.try(:content_view)].compact
+          lifecycle_environments = [cvenv.try(:environment)].compact
         end
         if content_views.present? && lifecycle_environments.present? && host.os && host.architecture
           Katello::Repository.in_environment(lifecycle_environments).in_content_views(content_views).
